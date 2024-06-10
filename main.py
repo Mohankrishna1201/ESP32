@@ -1,7 +1,6 @@
-from bleak import BleakClient
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from typing import Union
+from bleak import BleakClient
 
 app = FastAPI()
 
@@ -28,6 +27,7 @@ async def send_command(command: int) -> dict:
         print(f"Error: {e}")
         return {"status": "failed", "reason": str(e)}
 
+# Existing endpoints
 @app.post("/left")
 async def left(request: Request):
     data = await request.json()
@@ -40,26 +40,41 @@ async def left(request: Request):
 
 @app.get("/check")
 async def check():
-      # Directly await the async function
-      result = await send_command(2) 
-      return result
+    result = await send_command(2) 
+    return result
+
 @app.get("/right")
 async def right():
-      # Directly await the async function
-      result = await send_command(2) 
-      return result
+    result = await send_command(2) 
+    return result
+
 @app.get("/front")
 async def front():
-      # Directly await the async function
-      result = await send_command(1) 
-      return result
+    result = await send_command(1) 
+    return result
+
 @app.get("/down")
 async def down():
-      # Directly await the async function
-      result = await send_command(4) 
-      return result
+    result = await send_command(4) 
+    return result
+
 @app.get("/stop")
 async def stop():
-      # Directly await the async function
-    result = await send_command(-1)  # Directly await the async function
+    result = await send_command(-1)  
+    return result
+
+# Additional endpoints
+@app.post("/custom-command")
+async def custom_command(request: Request):
+    data = await request.json()
+    command = data.get("command")
+    if command is not None:
+        result = await send_command(command)
+        return result
+    else:
+        return {"status": "failed", "reason": "command not provided"}
+
+@app.post("/emergency-stop")
+async def emergency_stop():
+    result = await send_command(-1)  # Emergency stop command
     return result
